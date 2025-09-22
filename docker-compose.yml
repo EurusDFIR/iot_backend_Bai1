@@ -11,6 +11,7 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U iotuser -d iotdb"]
@@ -28,6 +29,7 @@ services:
     volumes:
       - mosquitto_data:/mosquitto/data
       - mosquitto_logs:/mosquitto/log
+      - ./mosquitto.conf:/mosquitto/config/mosquitto.conf
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "mosquitto_pub -h localhost -t health/check -m 'test' || exit 1"]
