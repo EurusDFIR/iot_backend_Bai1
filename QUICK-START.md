@@ -17,13 +17,25 @@ start.bat
 
 ## Bước 3: Test (sau 2-3 phút)
 
-- API: http://localhost:8080/api/devices
-- Database: localhost:5432 (iotdb/iotuser/secret)
-- MQTT: localhost:1883
+- **API**: http://localhost:8080/api/devices
+- **Database**: localhost:5432 (iotdb/iotuser/secret)
+- **MQTT TCP**: localhost:1883 (for MQTT Explorer)
+- **MQTT WebSocket**: localhost:9001 (alternative)
+
+### 📡 MQTT Explorer Setup:
+
+```
+Protocol: mqtt://
+Host: localhost
+Port: 1883
+Username: (empty)
+Password: (empty)
+```
 
 ## Scripts hữu ích:
 
-- `start.bat` - **Main start script** (đã tối ưu)
+- `start.bat` - **Main start script** (auto-fix all issues)
+- `mqtt-guide.bat` - **MQTT Explorer setup guide**
 - `test-api.bat` - Test toàn diện APIs
 - `kill-port-8080.bat` - Fix port conflicts
 - `debug-start.bat` - Debug step-by-step
@@ -32,6 +44,7 @@ start.bat
 
 - **Port conflict:** Script tự động fix
 - **Container conflicts:** `docker-compose -f docker-compose-simple.yml down --remove-orphans`
+- **MQTT Explorer errors:** Run `mqtt-guide.bat` for detailed setup
 - **Logs:** `docker-compose -f docker-compose-simple.yml logs iot-backend`
 
 ## ✅ Đã test thực tế:

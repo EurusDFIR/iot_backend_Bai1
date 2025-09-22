@@ -1,6 +1,31 @@
 @echo off
 echo.
-echo 🚀 IoT Backend - Quick Start for Windows
+echo 🚀 IoT Backend - Quick Stecho.
+echo 🧪 Testing API...
+curl -s http://localhost:8080/api/devices >nul 2>&1
+if %ERRORLEVEL% EQU 0 (
+    echo ✅ SUCCESS! API is responding!
+) else (
+    echo ⚠️  API not ready yet. Check logs:
+    echo    docker-compose -f docker-compose-simple.yml logs iot-backend
+)
+
+echo.
+echo 📡 Testing MQTT...
+docker exec mosquitto-iot-simple mosquitto_pub -h localhost -t "test/connection" -m "startup-test" >nul 2>&1
+if %ERRORLEVEL% EQU 0 (
+    echo ✅ SUCCESS! MQTT broker is working!
+) else (
+    echo ⚠️  MQTT test failed. Check logs:
+    echo    docker-compose -f docker-compose-simple.yml logs mosquitto
+)
+
+echo.
+echo 🌐 Available Services:
+echo    📱 Web API: http://localhost:8080/api/devices
+echo    📊 Database: localhost:5432 (iotdb/iotuser/secret)  
+echo    📡 MQTT TCP: localhost:1883
+echo    🌐 MQTT WebSocket: localhost:9001
 echo ========================================
 echo.
 
@@ -29,14 +54,14 @@ docker-compose -f docker-compose-simple.yml down --remove-orphans >nul 2>&1
 echo.
 echo 🚀 Starting IoT Backend (simple version)...
 echo    📦 PostgreSQL Database
-echo    📡 Mosquitto MQTT Broker  
+echo    📡 Mosquitto MQTT Broker (with config)
 echo    🌱 Spring Boot IoT Backend
 echo.
 echo ⏳ This may take 2-3 minutes for first build...
 echo.
 
-REM Start with simple compose file (no health checks issues)
-docker-compose -f docker-compose-simple.yml up --build -d
+REM Start with simple compose file - force recreate to ensure config is loaded
+docker-compose -f docker-compose-simple.yml up --build --force-recreate -d
 
 echo.
 echo ⏳ Waiting 90 seconds for all services...
