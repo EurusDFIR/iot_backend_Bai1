@@ -5,7 +5,7 @@
 Ứng dụng Spring Boot backend cho hệ thống IoT, bao gồm **7 Labs đầy đủ**:
 
 - **Lab 1:** Spring Boot Backend + Database
-- **Lab 2:** MQTT Client Integration 
+- **Lab 2:** MQTT Client Integration
 - **Lab 3:** Device CRUD API
 - **Lab 4:** Telemetry Save to Database
 - **Lab 5:** Device Command API
@@ -44,6 +44,7 @@ GRANT ALL ON SCHEMA public TO iotuser;
 ### 3. Install & Start Mosquitto MQTT Broker
 
 #### Windows:
+
 ```bash
 # Download từ https://mosquitto.org/download/
 # Hoặc dùng Chocolatey
@@ -53,7 +54,13 @@ choco install mosquitto
 net start mosquitto
 ```
 
+# pull 2 lenh nay ve docker de chay
+
+docker pull postgres:15
+docker pull eclipse-mosquitto:2
+
 #### Linux/Mac:
+
 ```bash
 # Ubuntu/Debian
 sudo apt-get install mosquitto mosquitto-clients
@@ -104,6 +111,7 @@ java -jar target/iot-backend-0.0.1-SNAPSHOT.jar
 App sẽ chạy trên: **http://localhost:8080**
 
 ### Lab 3: Device CRUD API
+
 ```
 GET    /api/devices              # Lấy danh sách devices
 POST   /api/devices              # Tạo device mới
@@ -114,11 +122,13 @@ GET    /api/devices/{id}/telemetry  # Lấy telemetry của device
 ```
 
 ### Lab 5: Device Commands
+
 ```
 POST   /api/devices/{id}/command # Gửi command tới device
 ```
 
 ### Lab 6: Monitoring & Dynamic Subscribe
+
 ```
 GET    /api/monitoring/overview  # Tổng quan hệ thống
 GET    /api/monitoring/devices   # Danh sách device status
@@ -127,6 +137,7 @@ GET    /api/mqtt/recent          # Messages gần nhất
 ```
 
 ### Lab 7: Data Optimization
+
 ```
 GET    /api/data-optimization/archive/statistics  # Thống kê archive
 POST   /api/data-optimization/archive/force       # Force archive data
@@ -144,6 +155,7 @@ App tự động subscribe các topics:
 - `iot/device/+/status` - Device status updates (Lab 6)
 
 App publish commands tới:
+
 - `iot/device/{id}/command` - Send commands to devices (Lab 5)
 
 ## 🧪 Testing
@@ -191,12 +203,12 @@ mqtt.password=
 
 ### Common Issues
 
-| Problem | Solution |
-|---------|----------|
-| **App không start** | Kiểm tra PostgreSQL đã chạy và database iotdb tồn tại |
-| **MQTT connection failed** | Kiểm tra Mosquitto broker chạy trên port 1883 |
-| **404 API errors** | Đảm bảo dùng đúng URL `http://localhost:8080` |
-| **500 Database errors** | Check database connection và user permissions |
+| Problem                    | Solution                                              |
+| -------------------------- | ----------------------------------------------------- |
+| **App không start**        | Kiểm tra PostgreSQL đã chạy và database iotdb tồn tại |
+| **MQTT connection failed** | Kiểm tra Mosquitto broker chạy trên port 1883         |
+| **404 API errors**         | Đảm bảo dùng đúng URL `http://localhost:8080`         |
+| **500 Database errors**    | Check database connection và user permissions         |
 
 ### Logs để debug
 
@@ -211,6 +223,7 @@ mqtt.password=
 ## 📊 Database Schema
 
 App tự động tạo tables:
+
 - `device` - Thông tin devices
 - `telemetry` - Dữ liệu cảm biến
 - `device_status` - Trạng thái devices
@@ -219,16 +232,19 @@ App tự động tạo tables:
 ## 🚢 Production Deployment
 
 1. **Package application:**
+
 ```bash
 mvn clean package -DskipTests
 ```
 
 2. **Run with production profile:**
+
 ```bash
 java -jar target/iot-backend-0.0.1-SNAPSHOT.jar --spring.profiles.active=prod
 ```
 
 3. **Environment variables:**
+
 ```bash
 export DB_URL=jdbc:postgresql://your-db-host:5432/iotdb
 export DB_USERNAME=your-username
@@ -251,7 +267,8 @@ This project is licensed under the MIT License.
 ## 📞 Support
 
 Nếu gặp vấn đề, hãy:
-1. Check file `IoT_Labs_Testing_Guide.md` 
+
+1. Check file `IoT_Labs_Testing_Guide.md`
 2. Xem phần Troubleshooting ở trên
 3. Tạo Issue trên GitHub repository
 
