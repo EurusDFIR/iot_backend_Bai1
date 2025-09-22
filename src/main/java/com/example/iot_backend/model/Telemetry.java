@@ -4,7 +4,11 @@ import jakarta.persistence.*;
 import java.time.Instant;
 
 @Entity
-@Table(name = "telemetry")
+@Table(name = "telemetry", indexes = {
+        @Index(name = "idx_telemetry_device_timestamp", columnList = "device_id, ts"),
+        @Index(name = "idx_telemetry_timestamp", columnList = "ts"),
+        @Index(name = "idx_telemetry_device", columnList = "device_id")
+})
 public class Telemetry {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

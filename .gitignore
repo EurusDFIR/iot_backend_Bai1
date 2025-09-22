@@ -1,10 +1,23 @@
-HELP.md
+# Spring Boot Application gitignore
+
+# Build and package output
 target/
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
 
-### STS ###
+# IDE Files
+### IntelliJ IDEA ###
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+
+### Eclipse ###
 .apt_generated
 .classpath
 .factorypath
@@ -12,12 +25,11 @@ target/
 .settings
 .springBeans
 .sts4-cache
+bin/
 
-### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
-*.ipr
+### VS Code ###
+.vscode/
+*.code-workspace
 
 ### NetBeans ###
 /nbproject/private/
@@ -25,9 +37,48 @@ target/
 /dist/
 /nbdist/
 /.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
 
-### VS Code ###
-.vscode/
+# Application logs
+logs/
+*.log
+*.log.*
+
+# OS Generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Environment and config files (keep application.properties but ignore sensitive ones)
+application-local.properties
+application-dev.properties
+application-prod.properties
+*.env
+.env.*
+
+# Database files (if using H2 for testing)
+*.db
+*.mv.db
+*.trace.db
+
+# Documentation that might be auto-generated
+HELP.md
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*~.nib
+
+# Maven Wrapper - keep these for easier setup
+# Uncomment if you want to force everyone to use same Maven version
+# .mvn/
+# mvnw
+# mvnw.cmd
+
+# Keep essential documentation and configs
+# !README.md
+# !IoT_Labs_Testing_Guide.md
