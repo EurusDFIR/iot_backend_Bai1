@@ -1,5 +1,5 @@
 # Multi-stage build để tối ưu size
-FROM maven:3.9.4-openjdk-17-slim AS build
+FROM maven:3.9-openjdk-17 AS build
 
 # Copy source code
 WORKDIR /app

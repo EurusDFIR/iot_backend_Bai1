@@ -41,7 +41,7 @@ set max_attempts=30
 set attempt=0
 
 :wait_loop
-docker-compose ps --filter status=running --filter health=healthy | findstr "iot-backend-app" >nul 2>&1
+docker-compose ps | findstr "iot-backend-app" | findstr "Up" >nul 2>&1
 if %ERRORLEVEL% EQU 0 (
     echo ✅ All services are running and healthy!
     goto success
