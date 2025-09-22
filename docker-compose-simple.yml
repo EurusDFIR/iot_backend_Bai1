@@ -19,8 +19,11 @@ services:
     container_name: mosquitto-iot-simple
     ports:
       - "1883:1883"
+      - "9001:9001"    # WebSocket port
     volumes:
       - mosquitto_data_simple:/mosquitto/data
+      - mosquitto_logs_simple:/mosquitto/log
+      - ./mosquitto.conf:/mosquitto/config/mosquitto.conf
     restart: unless-stopped
 
   # Spring Boot IoT Backend Application
@@ -46,4 +49,6 @@ volumes:
   postgres_data_simple:
     driver: local
   mosquitto_data_simple:
+    driver: local
+  mosquitto_logs_simple:
     driver: local
