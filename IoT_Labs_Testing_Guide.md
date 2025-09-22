@@ -156,7 +156,13 @@ DELETE /api/devices/{id}         # Xóa
 
 2. **Setup device subscriber** (MQTT Explorer subscribe)
 
-   - Topic: `iot/device/1/command` (thay 1 bằng device ID thực tế)
+Gửi heartbeat để tạo DeviceStatus
+MQTT Explorer:
+
+Topic: iot/device/1/heartbeat
+Message: {"deviceId": 1, "status": "ONLINE", "timestamp": "2025-09-22T14:30:00Z"}
+
+- Topic: `iot/device/1/command` (thay 1 bằng device ID thực tế)
 
 3. **Postman send command:**
 
