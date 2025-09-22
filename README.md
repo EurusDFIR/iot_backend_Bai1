@@ -1,41 +1,52 @@
 # 🚀 IoT Backend - Spring Boot Application
 
-## ⚡ Quick Start (2 phút setup)
+## ⚡ Quick Start cho Windows (2 phút setup)
 
-### 🎯 **Super Simple - Docker All-in-One (Khuyến nghị)**
+### 🎯 **Super Simple - Chỉ cần Docker!**
 
-**Chỉ cần Docker - không cần Java, Maven, PostgreSQL gì cả!**
+**Yêu cầu duy nhất: Docker Desktop for Windows**
 
-```bash
+#### 📋 **Bước 1: Cài Docker Desktop**
+
+1. Tải về: https://www.docker.com/products/docker-desktop
+2. Cài đặt và khởi động Docker Desktop
+3. Đợi Docker sẵn sàng (icon Docker ở system tray màu xanh)
+
+#### 🚀 **Bước 2: Chạy ứng dụng**
+
+```cmd
 # Clone repository
 git clone <repository-url>
 cd iot-backend
 
-# Windows - double click hoặc:
+# WINDOWS: Double-click start.bat hoặc:
 start.bat
-
-# Linux/Mac/Git Bash:
-chmod +x start.sh
-./start.sh
 ```
 
-**✅ XONG! Tất cả chạy trong Docker:**
+**✅ XONG! Trong 2-3 phút:**
 
 - **🌱 Spring Boot App:** http://localhost:8080
-- **📊 PostgreSQL:** localhost:5432
+- **📊 PostgreSQL:** localhost:5432 (iotdb/iotuser/secret)
 - **📡 MQTT Broker:** localhost:1883
 
-### 🎯 **Manual Docker (Alternative)**
+#### 🧪 **Bước 3: Test thử**
 
-````bash
+```cmd
+curl http://localhost:8080/api/devices
+curl http://localhost:8080/api/monitoring/overview
+```
+
+### 🎯 **Manual Docker (Nâng cao)**
+
+````cmd
 # 1. Build và start tất cả
 docker-compose up --build -d
 
 # 2. Check status
 docker-compose ps
 
-# 3. Test API
-curl http://localhost:8080/api/devices
+# 3. Stop all
+docker-compose down
 ```---
 
 ## 📝 Mô tả
