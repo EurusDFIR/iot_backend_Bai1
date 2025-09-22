@@ -205,20 +205,366 @@ DELETE /api/data/cleanup         # Cleanup old archived data
 
 ## 🧪 **Testing & MQTT**
 
+### 📋 **POSTMAN Collection - Chi tiết Test API**
+
+Tải Postman về: https://www.postman.com/downloads/
+
+#### **1️⃣ Setup Environment**
+
+Tạo Environment mới trong Postman:
+
+- **Name:** `IoT Backend Local`
+- **Variables:**
+  - `base_url`: `http://localhost:8080`
+  - `device_id`: `1` (sẽ được update động)
+
+#### **2️⃣ Collection: Lab 3 - Device CRUD API**
+
+```json
+{
+  "info": {
+    "name": "IoT Backend - Device API Tests",
+    "description": "Complete test collection for IoT Backend"
+  },
+  "item": [
+    {
+      "name": "1. Get All Devices",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/api/devices"
+      },
+      "test": [
+        "pm.test('Status code is 200', function () {",
+        "    pm.response.to.have.status(200);",
+        "});",
+        "pm.test('Response is array', function () {",
+        "    pm.expect(pm.response.json()).to.be.an('array');",
+        "});"
+      ]
+    },
+    {
+      "name": "2. Create New Device",
+      "request": {
+        "method": "POST",
+        "url": "{{base_url}}/api/devices",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "raw": "{\n  \"name\": \"Test Sensor {{$randomInt}}\",\n  \"type\": \"SENSOR\",\n  \"location\": \"Lab Room A\",\n  \"description\": \"Temperature and humidity sensor\"\n}"
+        }
+      },
+      "test": [
+        "pm.test('Status code is 201', function () {",
+        "    pm.response.to.have.status(201);",
+        "});",
+        "pm.test('Device created with ID', function () {",
+        "    const device = pm.response.json();",
+        "    pm.expect(device).to.have.property('id');",
+        "    pm.environment.set('device_id', device.id);",
+        "});"
+      ]
+    },
+    {
+      "name": "3. Get Device by ID",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/api/devices/{{device_id}}"
+      },
+      "test": [
+        "pm.test('Status code is 200', function () {",
+        "    pm.response.to.have.status(200);",
+        "});",
+        "pm.test('Device has required fields', function () {",
+        "    const device = pm.response.json();",
+        "    pm.expect(device).to.have.property('id');",
+        "    pm.expect(device).to.have.property('name');",
+        "    pm.expect(device).to.have.property('type');",
+        "});"
+      ]
+    },
+    {
+      "name": "4. Update Device",
+      "request": {
+        "method": "PUT",
+        "url": "{{base_url}}/api/devices/{{device_id}}",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "raw": "{\n  \"name\": \"Updated Test Sensor\",\n  \"type\": \"SENSOR\",\n  \"location\": \"Lab Room B\",\n  \"description\": \"Updated description\"\n}"
+        }
+      }
+    }
+  ]
+}
+```
+
+#### **3️⃣ Collection: Lab 4 - Telemetry API**
+
+```json
+{
+  "name": "Telemetry Tests",
+  "item": [
+    {
+      "name": "1. Get All Telemetry",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/api/telemetry"
+      }
+    },
+    {
+      "name": "2. Create Telemetry Data",
+      "request": {
+        "method": "POST",
+        "url": "{{base_url}}/api/telemetry",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "raw": "{\n  \"deviceId\": {{device_id}},\n  \"temperature\": {{$randomFloat}},\n  \"humidity\": {{$randomInt}},\n  \"timestamp\": \"{{$isoTimestamp}}\"\n}"
+        }
+      }
+    },
+    {
+      "name": "3. Get Telemetry by Device",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/api/telemetry/device/{{device_id}}"
+      }
+    }
+  ]
+}
+```
+
+#### **4️⃣ Collection: Lab 5 - Command API**
+
+```json
+{
+  "name": "Command Tests",
+  "item": [
+    {
+      "name": "1. Send Device Command",
+      "request": {
+        "method": "POST",
+        "url": "{{base_url}}/api/devices/{{device_id}}/command",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "raw": "{\n  \"command\": \"SET_TEMP\",\n  \"value\": \"25.5\",\n  \"description\": \"Set temperature threshold\"\n}"
+        }
+      }
+    },
+    {
+      "name": "2. Get All Commands",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/api/commands"
+      }
+    },
+    {
+      "name": "3. Get Command by ID",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/api/commands/1"
+      }
+    }
+  ]
+}
+```
+
+#### **5️⃣ Collection: Lab 6 - Monitoring API**
+
+```json
+{
+  "name": "Monitoring Tests",
+  "item": [
+    {
+      "name": "1. System Overview",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/api/monitoring/overview"
+      },
+      "test": [
+        "pm.test('Has system stats', function () {",
+        "    const response = pm.response.json();",
+        "    pm.expect(response).to.have.property('totalDevices');",
+        "    pm.expect(response).to.have.property('onlineDevices');",
+        "});"
+      ]
+    },
+    {
+      "name": "2. All Device Status",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/api/monitoring/devices"
+      }
+    },
+    {
+      "name": "3. Online Devices",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/api/monitoring/devices/online"
+      }
+    },
+    {
+      "name": "4. Mark Device Online",
+      "request": {
+        "method": "POST",
+        "url": "{{base_url}}/api/monitoring/devices/{{device_id}}/online"
+      }
+    },
+    {
+      "name": "5. Dashboard Data",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/api/monitoring/dashboard"
+      }
+    }
+  ]
+}
+```
+
+### **💡 Cách Import Collection vào Postman:**
+
+1. **Mở Postman** → Click "Import"
+2. **Copy-paste** JSON collection vào tab "Raw text"
+3. **Click "Continue"** → "Import"
+4. **Set Environment:** Chọn "IoT Backend Local" environment
+5. **Run Collection:** Click "Run" để test tất cả APIs
+
+### 📡 **MQTT Explorer - Chi tiết Test MQTT**
+
+Tải MQTT Explorer: http://mqtt-explorer.com/
+
+#### **🔧 Setup Connection**
+
+**Connection Settings:**
+
+```
+Protocol: mqtt://
+Host: localhost
+Port: 1883
+Username: (để trống)
+Password: (để trống)
+Client ID: mqtt-explorer-test
+```
+
+**Advanced Settings:**
+
+- Keep Alive: 60
+- Clean Session: ✅ Enabled
+- Auto Reconnect: ✅ Enabled
+
+#### **📊 Test Topics Structure**
+
+Project sử dụng topic structure:
+
+```
+iot/
+├── devices/
+│   ├── {deviceId}/
+│   │   ├── telemetry     # Device gửi dữ liệu sensor
+│   │   ├── command       # Server gửi lệnh đến device
+│   │   └── status        # Device báo trạng thái
+│   └── broadcast/        # Lệnh broadcast tới all devices
+└── system/
+    ├── health            # Health check messages
+    └── logs              # System logs
+```
+
+#### **📝 Test Scenarios**
+
+**Scenario 1: Telemetry Data Testing**
+
+1. **Subscribe topics:**
+
+   - `iot/devices/+/telemetry`
+   - `iot/devices/1/telemetry`
+
+2. **Publish test data:**
+   ```json
+   Topic: iot/devices/1/telemetry
+   QoS: 1
+   Payload:
+   {
+     "deviceId": 1,
+     "temperature": 24.5,
+     "humidity": 65.2,
+     "timestamp": "2024-01-15T10:30:00Z"
+   }
+   ```
+
+**Scenario 2: Command Testing**
+
+1. **Subscribe to command topics:**
+
+   - `iot/devices/+/command`
+   - `iot/devices/1/command`
+
+2. **Gửi command qua Postman API**, quan sát message trong MQTT Explorer
+
+3. **Manual command publish:**
+   ```json
+   Topic: iot/devices/1/command
+   QoS: 1
+   Payload:
+   {
+     "commandId": "cmd-123",
+     "command": "SET_TEMP",
+     "value": "26.0",
+     "timestamp": "2024-01-15T10:35:00Z"
+   }
+   ```
+
+**Scenario 3: Device Status Monitoring**
+
+1. **Subscribe:**
+
+   - `iot/devices/+/status`
+
+2. **Publish device status:**
+   ```json
+   Topic: iot/devices/1/status
+   Payload:
+   {
+     "deviceId": 1,
+     "status": "ONLINE",
+     "lastSeen": "2024-01-15T10:40:00Z",
+     "uptime": 3600
+   }
+   ```
+
 ### Test MQTT với Command Line
 
 ```bash
 # Subscribe to telemetry topic
-docker exec mosquitto-iot mosquitto_sub -h localhost -t "iot/demo/temp"
+docker exec mosquitto-iot-simple mosquitto_sub -h localhost -t "iot/devices/+/telemetry"
 
 # Publish test telemetry data
-docker exec mosquitto-iot mosquitto_pub -h localhost -t "iot/demo/temp" -m '{"deviceId":"test-01","temperature":25.5,"humidity":60,"timestamp":"2024-01-01T10:00:00Z"}'
+docker exec mosquitto-iot-simple mosquitto_pub -h localhost -t "iot/devices/1/telemetry" -m '{"deviceId":1,"temperature":25.5,"humidity":60,"timestamp":"2024-01-01T10:00:00Z"}'
 
 # Subscribe to command topics
-docker exec mosquitto-iot mosquitto_sub -h localhost -t "iot/devices/+/command"
+docker exec mosquitto-iot-simple mosquitto_sub -h localhost -t "iot/devices/+/command"
+
+# Test command publish
+docker exec mosquitto-iot-simple mosquitto_pub -h localhost -t "iot/devices/1/command" -m '{"command":"SET_TEMP","value":"25"}'
 ```
 
-### Test với Postman hoặc curl
+### Test với curl
 
 ```bash
 # Tạo device mới
@@ -229,11 +575,274 @@ curl -X POST http://localhost:8080/api/devices \
 # Lấy danh sách devices
 curl http://localhost:8080/api/devices
 
-# Gửi command
+# Gửi command (xem kết quả trong MQTT Explorer)
 curl -X POST http://localhost:8080/api/devices/1/command \
   -H "Content-Type: application/json" \
   -d '{"command":"SET_TEMP","value":"25"}'
+
+# Kiểm tra monitoring
+curl http://localhost:8080/api/monitoring/overview
 ```
+
+## 🎯 **End-to-End Testing Scenarios**
+
+### **🔄 Scenario 1: Device Lifecycle Testing**
+
+**Mô tả:** Test toàn bộ lifecycle của một IoT device từ tạo → gửi data → nhận command → monitoring
+
+**Steps:**
+
+1. **Tạo device qua Postman:**
+
+   ```http
+   POST /api/devices
+   {
+     "name": "Smart Thermostat",
+     "type": "SENSOR",
+     "location": "Living Room"
+   }
+   ```
+
+2. **Subscribe MQTT topics trong MQTT Explorer:**
+
+   - `iot/devices/+/telemetry`
+   - `iot/devices/+/command`
+   - `iot/devices/+/status`
+
+3. **Device gửi telemetry data (qua MQTT Explorer):**
+
+   ```json
+   Topic: iot/devices/1/telemetry
+   {
+     "deviceId": 1,
+     "temperature": 22.5,
+     "humidity": 45.0,
+     "timestamp": "2024-01-15T10:00:00Z"
+   }
+   ```
+
+4. **Kiểm tra data đã lưu vào DB (qua Postman):**
+
+   ```http
+   GET /api/telemetry/device/1
+   ```
+
+5. **Gửi command từ server (qua Postman):**
+
+   ```http
+   POST /api/devices/1/command
+   {
+     "command": "SET_TEMP",
+     "value": "24.0"
+   }
+   ```
+
+6. **Xác nhận command được gửi qua MQTT:**
+
+   - Quan sát message xuất hiện trong MQTT Explorer topic `iot/devices/1/command`
+
+7. **Device báo status online:**
+
+   ```json
+   Topic: iot/devices/1/status
+   {
+     "deviceId": 1,
+     "status": "ONLINE",
+     "lastSeen": "2024-01-15T10:05:00Z"
+   }
+   ```
+
+8. **Kiểm tra monitoring dashboard:**
+   ```http
+   GET /api/monitoring/dashboard
+   GET /api/monitoring/devices/1
+   ```
+
+### **🌐 Scenario 2: Multi-Device IoT Network**
+
+**Setup 3 devices cùng lúc:**
+
+1. **Tạo 3 devices khác nhau:**
+
+   - Temperature Sensor (ID: 1)
+   - Humidity Sensor (ID: 2)
+   - Smart Light (ID: 3)
+
+2. **Mỗi device gửi data khác nhau:**
+
+   ```bash
+   # Device 1 - Temperature
+   iot/devices/1/telemetry: {"deviceId":1,"temperature":25.5}
+
+   # Device 2 - Humidity
+   iot/devices/2/telemetry: {"deviceId":2,"humidity":60.0}
+
+   # Device 3 - Light status
+   iot/devices/3/telemetry: {"deviceId":3,"brightness":75,"color":"warm"}
+   ```
+
+3. **Test broadcast command:**
+
+   ```http
+   POST /api/devices/broadcast/command
+   {
+     "command": "HEALTH_CHECK",
+     "broadcast": true
+   }
+   ```
+
+4. **Monitor system overview:**
+   ```http
+   GET /api/monitoring/overview
+   # Expected: totalDevices: 3, onlineDevices: 3
+   ```
+
+### **⚡ Scenario 3: Real-time Performance Testing**
+
+**Mô phỏng high-frequency data:**
+
+1. **Setup continuous telemetry stream:**
+
+   - Script Python gửi data mỗi 5 giây
+   - Monitor MQTT Explorer để xem realtime
+   - Check database growth
+
+2. **Load testing script:**
+
+   ```python
+   import time
+   import json
+   import paho.mqtt.client as mqtt
+
+   client = mqtt.Client()
+   client.connect("localhost", 1883, 60)
+
+   for i in range(100):
+       data = {
+           "deviceId": 1,
+           "temperature": 20 + (i % 10),
+           "timestamp": time.time()
+       }
+       client.publish("iot/devices/1/telemetry", json.dumps(data))
+       time.sleep(1)
+   ```
+
+3. **Monitor performance:**
+   ```http
+   GET /api/monitoring/dashboard
+   GET /api/telemetry/device/1?limit=50
+   ```
+
+### **🔍 Scenario 4: Error Handling & Edge Cases**
+
+1. **Test invalid device ID:**
+
+   ```http
+   GET /api/devices/999
+   # Expected: 404 Not Found
+   ```
+
+2. **Test malformed MQTT message:**
+
+   ```
+   Topic: iot/devices/1/telemetry
+   Payload: "invalid json data"
+   # Check logs for error handling
+   ```
+
+3. **Test device offline scenario:**
+
+   ```http
+   POST /api/monitoring/devices/1/offline
+   GET /api/monitoring/devices/offline
+   ```
+
+4. **Test command to non-existent device:**
+   ```http
+   POST /api/devices/999/command
+   {
+     "command": "TEST"
+   }
+   # Expected: 400 Bad Request
+   ```
+
+## 📊 **Testing Checklist**
+
+### ✅ **API Testing (Postman)**
+
+- [ ] All CRUD operations work for devices
+- [ ] Telemetry data is saved correctly
+- [ ] Commands are sent and stored
+- [ ] Monitoring endpoints return correct data
+- [ ] Error handling works for invalid requests
+- [ ] Response times are acceptable (<500ms)
+
+### ✅ **MQTT Testing (MQTT Explorer)**
+
+- [ ] Can connect to broker successfully
+- [ ] Subscribe to wildcard topics works
+- [ ] Published messages appear in correct topics
+- [ ] QoS levels work as expected
+- [ ] Retained messages work correctly
+- [ ] Large payloads are handled properly
+
+### ✅ **Integration Testing**
+
+- [ ] API commands trigger MQTT messages
+- [ ] MQTT telemetry appears in database
+- [ ] Device status updates correctly
+- [ ] Monitoring data reflects reality
+- [ ] End-to-end workflows complete successfully
+
+### ✅ **Performance Testing**
+
+- [ ] System handles 100+ messages/minute
+- [ ] Database queries remain fast
+- [ ] Memory usage stays stable
+- [ ] No connection leaks in MQTT
+- [ ] Concurrent users supported
+
+## 🐛 **Common Issues & Solutions**
+
+| Issue                      | Symptom                        | Solution                                               |
+| -------------------------- | ------------------------------ | ------------------------------------------------------ |
+| **MQTT Connection Failed** | Can't connect in MQTT Explorer | Check Docker containers running, use `mqtt-guide.bat`  |
+| **API 404 Errors**         | Endpoints not found            | Verify Spring Boot started completely, check port 8080 |
+| **Empty Response**         | APIs return `[]`               | Check database initialized, run `integration-test.bat` |
+| **MQTT Messages Missing**  | Published but not received     | Verify topic names, check container networking         |
+| **Slow Performance**       | High response times            | Restart containers, check database connections         |
+
+## 🎓 **Learning Objectives Achieved**
+
+Sau khi hoàn thành testing:
+
+- ✅ **Lab 1-2:** Spring Boot + MQTT integration working
+- ✅ **Lab 3:** Complete Device CRUD API
+- ✅ **Lab 4:** Telemetry data flow (MQTT → Database)
+- ✅ **Lab 5:** Command system (API → MQTT → Device)
+- ✅ **Lab 6:** Real-time monitoring & dynamic subscriptions
+- ✅ **Lab 7:** Performance optimization & data management
+
+**🎉 Project hoàn chính là một IoT backend platform đầy đủ tính năng!**
+
+---
+
+## 📚 **Documentation & Testing**
+
+### **Tài liệu chi tiết:**
+
+- `TESTING_GUIDE.md` - **Hướng dẫn test chi tiết với Postman & MQTT Explorer**
+- `QUICK-START.md` - Setup nhanh 2 phút
+- `Lab1-7_*.md` - Chi tiết từng Lab
+
+### **Scripts hữu ích:**
+
+- `start.bat` - **Main startup script**
+- `mqtt-guide.bat` - Hướng dẫn MQTT Explorer setup
+- `integration-test.bat` - Test toàn diện tự động
+- `debug-start.bat` - Debug step-by-step
+
+**💡 Khuyến nghị:** Đọc `TESTING_GUIDE.md` để test đầy đủ tính năng với Postman và MQTT Explorer!
 
 ## 🎯 **Development Mode (Không dùng Docker)**
 
