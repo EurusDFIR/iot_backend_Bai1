@@ -1,5 +1,26 @@
 # 🚀 IoT Backend - Spring Boot Application
 
+## ⚡ Quick Start (3 phút setup)
+
+```bash
+# 1. Clone repository
+git clone <repository-url>
+cd iot-backend
+
+# 2. Start database và MQTT broker
+docker-compose up -d
+
+# 3. Run Spring Boot app
+./mvnw spring-boot:run
+
+# 4. Test API
+curl http://localhost:8080/api/devices
+```
+
+**✅ Xong! App chạy tại http://localhost:8080**
+
+---
+
 ## 📝 Mô tả
 
 Ứng dụng Spring Boot backend cho hệ thống IoT, bao gồm **7 Labs đầy đủ**:
@@ -28,7 +49,30 @@ git clone <repository-url>
 cd iot-backend
 ```
 
-### 2. Setup PostgreSQL Database
+### 2. Setup với Docker (Khuyến nghị) 🐳
+
+**Cách nhanh nhất - chỉ cần Docker:**
+
+```bash
+# Chạy PostgreSQL và Mosquitto với Docker Compose
+docker-compose up -d
+
+# Kiểm tra containers đang chạy
+docker-compose ps
+
+# Xem logs
+docker-compose logs postgres
+docker-compose logs mosquitto
+```
+
+**Sau khi containers chạy, database và MQTT broker đã sẵn sàng tại:**
+
+- **PostgreSQL:** `localhost:5432` (Database: `iotdb`, User: `iotuser`, Pass: `secret`)
+- **Mosquitto MQTT:** `localhost:1883`
+
+### 3. Setup Manual (Alternative)
+
+#### PostgreSQL Database
 
 ```sql
 -- Tạo database và user
@@ -41,25 +85,19 @@ GRANT ALL PRIVILEGES ON DATABASE iotdb TO iotuser;
 GRANT ALL ON SCHEMA public TO iotuser;
 ```
 
-### 3. Install & Start Mosquitto MQTT Broker
+#### Mosquitto MQTT Broker
 
-#### Windows:
+##### Windows:
 
 ```bash
 # Download từ https://mosquitto.org/download/
 # Hoặc dùng Chocolatey
 choco install mosquitto
 
-# Start service
 net start mosquitto
 ```
 
-# pull 2 lenh nay ve docker de chay
-
-docker pull postgres:15
-docker pull eclipse-mosquitto:2
-
-#### Linux/Mac:
+##### Linux/Mac:
 
 ```bash
 # Ubuntu/Debian
@@ -73,6 +111,11 @@ sudo systemctl enable mosquitto
 ### 4. Verify Setup
 
 ```bash
+# Với Docker Compose (containers đang chạy)
+docker-compose exec postgres psql -U iotuser -d iotdb -c "SELECT version();"
+docker-compose exec mosquitto mosquitto_pub -h localhost -t test/topic -m "Hello MQTT"
+
+# Với manual setup
 # Test PostgreSQL connection
 psql -h localhost -U iotuser -d iotdb
 
@@ -203,12 +246,33 @@ mqtt.password=
 
 ### Common Issues
 
-| Problem                    | Solution                                              |
-| -------------------------- | ----------------------------------------------------- |
-| **App không start**        | Kiểm tra PostgreSQL đã chạy và database iotdb tồn tại |
-| **MQTT connection failed** | Kiểm tra Mosquitto broker chạy trên port 1883         |
-| **404 API errors**         | Đảm bảo dùng đúng URL `http://localhost:8080`         |
-| **500 Database errors**    | Check database connection và user permissions         |
+| Problem                        | Solution                                                                |
+| ------------------------------ | ----------------------------------------------------------------------- |
+| **App không start**            | Kiểm tra PostgreSQL đã chạy: `docker-compose ps` hoặc manual setup      |
+| **MQTT connection failed**     | Kiểm tra Mosquitto container: `docker-compose logs mosquitto`           |
+| **404 API errors**             | Đảm bảo dùng đúng URL `http://localhost:8080`                           |
+| **500 Database errors**        | Check database: `docker-compose exec postgres psql -U iotuser -d iotdb` |
+| **Port conflicts (5432/1883)** | Stop existing services hoặc đổi ports trong docker-compose.yml          |
+
+### Docker Commands hữu ích
+
+```bash
+# Stop tất cả containers
+docker-compose down
+
+# Stop và xóa volumes (reset data)
+docker-compose down -v
+
+# Restart services
+docker-compose restart
+
+# Xem logs real-time
+docker-compose logs -f
+
+# Exec vào container
+docker-compose exec postgres bash
+docker-compose exec mosquitto sh
+```
 
 ### Logs để debug
 
