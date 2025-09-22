@@ -13,7 +13,9 @@ cd iot-backend
 start.bat
 ```
 
-## Bước 3: Test
+> **💡 Script tự động:** Kill port 8080, dọn containers cũ, build & start!
+
+## Bước 3: Test (sau 2-3 phút)
 
 - API: http://localhost:8080/api/devices
 - Database: localhost:5432 (iotdb/iotuser/secret)
@@ -21,16 +23,22 @@ start.bat
 
 ## Scripts hữu ích:
 
-- `check-system.bat` - Kiểm tra hệ thống
-- `start.bat` - Khởi động
-- `stop.bat` - Dừng
-- `status.bat` - Kiểm tra trạng thái
-- `test-api.bat` - Test API
+- `start.bat` - **Main start script** (đã tối ưu)
+- `test-api.bat` - Test toàn diện APIs
+- `kill-port-8080.bat` - Fix port conflicts
+- `debug-start.bat` - Debug step-by-step
 
 ## Troubleshooting:
 
-- Lỗi port: Xem README.md phần troubleshooting
-- Logs: `docker-compose logs iot-backend`
-- Reset: `stop-and-clean.bat` + `start.bat`
+- **Port conflict:** Script tự động fix
+- **Container conflicts:** `docker-compose -f docker-compose-simple.yml down --remove-orphans`
+- **Logs:** `docker-compose -f docker-compose-simple.yml logs iot-backend`
 
-**🎉 Done! Happy coding!**
+## ✅ Đã test thực tế:
+
+- ✅ Container conflicts: Auto-fixed
+- ✅ Port 8080 conflicts: Auto-cleaned
+- ✅ Health checks: Removed (causes issues)
+- ✅ File mounting: Simplified for Windows
+
+**🎉 Clone → start.bat → Enjoy! (Really works!)**

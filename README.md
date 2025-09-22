@@ -23,14 +23,19 @@ cd iot-backend
 start.bat
 ```
 
+> **💡 Lưu ý:** Script sẽ tự động:
+>
+> - Kiểm tra Docker Desktop
+> - Dọn sạch port 8080 nếu bị chiếm
+> - Khởi động tất cả services
+> - Test API để đảm bảo hoạt động
+
 #### ✅ **XONG! Trong 2-3 phút:**
 
 - **🌱 Spring Boot App:** http://localhost:8080
 - **📊 PostgreSQL:** localhost:5432 (iotdb/iotuser/secret)
 - **📡 MQTT Broker:** localhost:1883
-- **🌐 MQTT WebSocket:** localhost:9001
-
-#### 🧪 **Bước 3: Test thử**
+- **🌐 MQTT WebSocket:** localhost:9001#### 🧪 **Bước 3: Test thử**
 
 ```cmd
 # Test API endpoints

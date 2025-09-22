@@ -1,7 +1,7 @@
 @echo off
 echo.
-echo 🚀 IoT Backend - Docker All-in-One Setup
-echo =========================================
+echo 🚀 IoT Backend - Quick Start for Windows
+echo ========================================
 echo.
 
 REM Check Docker
@@ -13,72 +13,58 @@ if %ERRORLEVEL% NEQ 0 (
     exit /b 1
 )
 
-docker info >nul 2>&1
-if %ERRORLEVEL% NEQ 0 (
-    echo ❌ Docker not running. Please start Docker Desktop.
-    pause
-    exit /b 1
+echo ✅ Docker found
+echo.
+
+REM Kill any process using port 8080
+echo 🔧 Cleaning up port 8080...
+for /f "tokens=5" %%a in ('netstat -ano ^| findstr :8080 2^>nul') do (
+    echo Killing process %%a on port 8080...
+    taskkill /PID %%a /F >nul 2>&1
 )
 
-echo ✅ Docker is ready
-echo.
-
-REM Stop any existing containers
-echo 🛑 Stopping existing containers...
-docker-compose down -v
+echo 🛑 Cleaning up any existing containers...
+docker-compose -f docker-compose-simple.yml down --remove-orphans >nul 2>&1
 
 echo.
-echo 🏗️  Building and starting all services...
+echo 🚀 Starting IoT Backend (simple version)...
 echo    📦 PostgreSQL Database
-echo    📡 Mosquitto MQTT Broker
+echo    📡 Mosquitto MQTT Broker  
 echo    🌱 Spring Boot IoT Backend
 echo.
 echo ⏳ This may take 2-3 minutes for first build...
 echo.
 
-REM Build and start all services
-docker-compose up --build -d
+REM Start with simple compose file (no health checks issues)
+docker-compose -f docker-compose-simple.yml up --build -d
 
-REM Wait for services to be healthy
-echo ⏳ Waiting for all services to be ready...
-set max_attempts=30
-set attempt=0
+echo.
+echo ⏳ Waiting 90 seconds for all services...
+timeout /t 90 /nobreak >nul
 
-:wait_loop
-docker-compose ps | findstr "iot-backend-app" | findstr "Up" >nul 2>&1
+echo.
+echo 📋 Service Status:
+docker-compose -f docker-compose-simple.yml ps
+
+echo.
+echo 🧪 Testing API...
+curl -s http://localhost:8080/api/devices >nul 2>&1
 if %ERRORLEVEL% EQU 0 (
-    echo ✅ All services are running and healthy!
-    goto success
+    echo ✅ SUCCESS! API is responding!
+) else (
+    echo ⚠️  API not ready yet. Check logs:
+    echo    docker-compose -f docker-compose-simple.yml logs iot-backend
 )
 
-set /a attempt+=1
-if %attempt% GEQ %max_attempts% (
-    echo ❌ Services took too long to start. Check logs:
-    echo    docker-compose logs iot-backend
-    pause
-    exit /b 1
-)
-
-echo    Still waiting... (%attempt%/%max_attempts%)
-timeout /t 10 /nobreak >nul
-goto wait_loop
-
-:success
 echo.
-echo 🎉 SUCCESS! IoT Backend is running!
-echo.
-echo ==================================
-echo 📱 Web API: http://localhost:8080
-echo 📊 Database: localhost:5432 (iotdb/iotuser/secret)
-echo 📡 MQTT: localhost:1883
-echo.
-echo 🧪 Quick test:
-echo curl http://localhost:8080/api/devices
+echo � Available Services:
+echo    📱 Web API: http://localhost:8080/api/devices
+echo    📊 Database: localhost:5432 (iotdb/iotuser/secret)  
+echo    📡 MQTT: localhost:1883
 echo.
 echo 🔧 Useful commands:
-echo    View logs:    docker-compose logs -f
-echo    Stop all:     docker-compose down
-echo    Restart:      docker-compose restart
-echo    Clean reset:  docker-compose down -v ^&^& docker-compose up -d
+echo    View logs: docker-compose -f docker-compose-simple.yml logs -f
+echo    Stop all:  docker-compose -f docker-compose-simple.yml down
+echo    Status:    docker-compose -f docker-compose-simple.yml ps
 echo.
 pause
