@@ -1,0 +1,49 @@
+services:
+  # PostgreSQL Database - Simple version
+  postgres:
+    image: postgres:15
+    container_name: pg-iot-simple
+    environment:
+      POSTGRES_DB: iotdb
+      POSTGRES_USER: iotuser
+      POSTGRES_PASSWORD: secret
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data_simple:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  # Mosquitto MQTT Broker - Simple version  
+  mosquitto:
+    image: eclipse-mosquitto:2
+    container_name: mosquitto-iot-simple
+    ports:
+      - "1883:1883"
+    volumes:
+      - mosquitto_data_simple:/mosquitto/data
+    restart: unless-stopped
+
+  # Spring Boot IoT Backend Application
+  iot-backend:
+    build: .
+    container_name: iot-backend-app-simple
+    ports:
+      - "8080:8080"
+    environment:
+      # Database config
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/iotdb
+      SPRING_DATASOURCE_USERNAME: iotuser
+      SPRING_DATASOURCE_PASSWORD: secret
+      # MQTT config
+      MQTT_HOST: mosquitto
+      MQTT_PORT: 1883
+    depends_on:
+      - postgres
+      - mosquitto
+    restart: unless-stopped
+
+volumes:
+  postgres_data_simple:
+    driver: local
+  mosquitto_data_simple:
+    driver: local

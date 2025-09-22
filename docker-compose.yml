@@ -11,13 +11,13 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U iotuser -d iotdb"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
   # Mosquitto MQTT Broker
   mosquitto:
@@ -29,13 +29,13 @@ services:
     volumes:
       - mosquitto_data:/mosquitto/data
       - mosquitto_logs:/mosquitto/log
-      - ./mosquitto.conf:/mosquitto/config/mosquitto.conf
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "mosquitto_pub -h localhost -t health/check -m 'test' || exit 1"]
+      test: ["CMD-SHELL", "timeout 10 mosquitto_pub -h localhost -t health/check -m 'test' || exit 1"]
       interval: 30s
-      timeout: 10s
-      retries: 5
+      timeout: 15s
+      retries: 3
+      start_period: 30s
 
   # Spring Boot IoT Backend Application
   iot-backend:
