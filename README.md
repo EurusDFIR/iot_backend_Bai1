@@ -1,25 +1,42 @@
 # 🚀 IoT Backend - Spring Boot Application
 
-## ⚡ Quick Start (3 phút setup)
+## ⚡ Quick Start (2 phút setup)
+
+### 🎯 **Super Simple - Docker All-in-One (Khuyến nghị)**
+
+**Chỉ cần Docker - không cần Java, Maven, PostgreSQL gì cả!**
 
 ```bash
-# 1. Clone repository
+# Clone repository
 git clone <repository-url>
 cd iot-backend
 
-# 2. Start database và MQTT broker
-docker-compose up -d
+# Windows - double click hoặc:
+start.bat
 
-# 3. Run Spring Boot app
-./mvnw spring-boot:run
-
-# 4. Test API
-curl http://localhost:8080/api/devices
+# Linux/Mac/Git Bash:
+chmod +x start.sh
+./start.sh
 ```
 
-**✅ Xong! App chạy tại http://localhost:8080**
+**✅ XONG! Tất cả chạy trong Docker:**
 
----
+- **🌱 Spring Boot App:** http://localhost:8080
+- **📊 PostgreSQL:** localhost:5432
+- **📡 MQTT Broker:** localhost:1883
+
+### 🎯 **Manual Docker (Alternative)**
+
+````bash
+# 1. Build và start tất cả
+docker-compose up --build -d
+
+# 2. Check status
+docker-compose ps
+
+# 3. Test API
+curl http://localhost:8080/api/devices
+```---
 
 ## 📝 Mô tả
 
@@ -35,10 +52,11 @@ curl http://localhost:8080/api/devices
 
 ## 🔧 Yêu cầu hệ thống
 
-- **Java 17+**
-- **Maven 3.6+**
-- **PostgreSQL 12+**
-- **Mosquitto MQTT Broker** (hoặc bất kỳ MQTT broker nào)
+- **Java 17+** ⚠️ **QUAN TRỌNG:** Đảm bảo JAVA_HOME được set đúng
+- **Maven 3.6+** (optional - có sẵn Maven Wrapper)
+- **Docker & Docker Compose** (cho database và MQTT broker)
+- ~~**PostgreSQL 12+**~~ (dùng Docker thay thế)
+- ~~**Mosquitto MQTT Broker**~~ (dùng Docker thay thế)
 
 ## 🏗️ Setup Environment
 
@@ -47,7 +65,7 @@ curl http://localhost:8080/api/devices
 ```bash
 git clone <repository-url>
 cd iot-backend
-```
+````
 
 ### 2. Setup với Docker (Khuyến nghị) 🐳
 
@@ -243,6 +261,15 @@ mqtt.password=
 ```
 
 ## 🐛 Troubleshooting
+
+### ⚠️ Java/Maven Issues (Phổ biến nhất)
+
+| Problem                             | Solution                                                                                            |
+| ----------------------------------- | --------------------------------------------------------------------------------------------------- |
+| **JAVA_HOME not defined correctly** | `export JAVA_HOME="C:/Program Files/Eclipse Adoptium/jdk-17"` <br> Hoặc dùng: `mvn spring-boot:run` |
+| **Maven wrapper lỗi**               | Dùng system Maven: `mvn spring-boot:run`                                                            |
+| **Java not found**                  | Install JDK 17+: [Adoptium OpenJDK](https://adoptium.net/)                                          |
+| **Permission denied ./mvnw**        | `chmod +x mvnw` (Linux/Mac) <br> Hoặc dùng `mvn` thay vì `./mvnw`                                   |
 
 ### Common Issues
 
